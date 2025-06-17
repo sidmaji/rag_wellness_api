@@ -16,6 +16,10 @@ const {
 const EMBEDDING_URL = `${AZURE_OPENAI_ENDPOINT}openai/deployments/${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}/embeddings?api-version=2023-05-15`;
 const CHAT_URL = `${AZURE_OPENAI_ENDPOINT}openai/deployments/${AZURE_OPENAI_CHAT_DEPLOYMENT}/chat/completions?api-version=2024-12-01-preview`;
 
+router.get("/test", (req, res) => {
+  res.json({ message: "API is working on Vercel!" });
+});
+
 router.post("/", async (req, res) => {
     console.log("Incoming POST /api/query:", req.body);
     console.log("Headers:", req.headers);
