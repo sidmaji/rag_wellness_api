@@ -16,23 +16,15 @@ const {
 const EMBEDDING_URL = `${AZURE_OPENAI_ENDPOINT}openai/deployments/${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}/embeddings?api-version=2023-05-15`;
 const CHAT_URL = `${AZURE_OPENAI_ENDPOINT}openai/deployments/${AZURE_OPENAI_CHAT_DEPLOYMENT}/chat/completions?api-version=2024-12-01-preview`;
 
-router.get("/test", (req, res) => {
-  res.json({ message: "API is working on Vercel!" });
-});
-
 router.post("/", async (req, res) => {
-    console.log("Incoming POST /api/query:", req.body);
-    console.log("Headers:", req.headers);
-    console.log("Environment Variables:", {
-        AZURE_OPENAI_API_KEY,
-        AZURE_OPENAI_ENDPOINT,
-        AZURE_OPENAI_CHAT_DEPLOYMENT,
-        AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
-        AZURE_SEARCH_API_KEY,
-        AZURE_SEARCH_ENDPOINT,
-        AZURE_SEARCH_INDEX,
-    });
+    //console.log("Incoming POST /api/query:", req.body);
+    //console.log("Loaded ENV:", process.env);
+    //console.log("Headers:", req.headers);
+
     const query = req.body.query;
+    const searchIndex = req.body.searchIndex || AZURE_SEARCH_INDEX;
+    
+    //console.log(query);
     if (!query) {
         return res.status(400).json({ error: "Query is required" });
     }
@@ -53,15 +45,15 @@ router.post("/", async (req, res) => {
         //const embedding = embedRes.data.data[0].embedding; // Adjusted to match the expected response structure
         //console.log("🧠 Embedding vector:", embedding.slice(0, 5));
 
-        console.log("Embedding length:", embedding.length);
-        console.log("Embedding sample:", embedding.slice(0, 5));
-        console.log("Embedding is array?", Array.isArray(embedding));
-        console.log(embedding);
+        //console.log("Embedding length:", embedding.length);
+        //console.log("Embedding sample:", embedding.slice(0, 5));
+        //console.log("Embedding is array?", Array.isArray(embedding));
+        //console.log(embedding);
         
         // 2. Search Azure Vector DB
         const searchRes = await axios.post(
             //`${AZURE_SEARCH_ENDPOINT}indexes/${AZURE_SEARCH_INDEX}/docs/search?api-version=2023-07-01-Preview`,
-            `${AZURE_SEARCH_ENDPOINT}indexes/${AZURE_SEARCH_INDEX}/docs/search.post.search?api-version=2024-07-01`,
+            `${AZURE_SEARCH_ENDPOINT}indexes/${searchIndex}/docs/search.post.search?api-version=2024-07-01`,
             {
                 vectorQueries:[ {
                     "kind": "vector",
@@ -91,7 +83,7 @@ router.post("/", async (req, res) => {
                 messages: [
                     {
                         role: "system",
-                        content: "You are a helpful assistant. Use the provided context to answer the question.",
+                        content: "You are a helpful assistant. Use the provided context to answer the question. Do not make up answers. If you don't know the answer, say 'I don't know'.",
                     },
                     {
                         role: "user",
