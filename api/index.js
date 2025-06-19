@@ -1,3 +1,4 @@
+// api/index.js
 const express = require("express");
 const serverless = require("serverless-http");
 const cors = require("cors");
