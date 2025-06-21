@@ -1,5 +1,7 @@
 {
   "version": 2,
-  "builds": [{ "src": "api/index.js", "use": "@vercel/node" }],
-  "routes": [{ "src": "/api/(.*)", "dest": "api/index.js" }]
+  "builds": [{ "src": "api/query.js", "use": "@vercel/node" }],
+  "routes": [
+    { "src": "/api/query", "methods": ["POST", "OPTIONS"], "dest": "api/query.js" }
+  ]
 }
